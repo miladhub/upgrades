@@ -1,4 +1,10 @@
-module Upgrades ( Res, Upgrade(..), log, crash, upgrade ) where
+module Upgrades
+  ( Res
+  , Upgrade(..)
+  , log
+  , crash
+  , upgrade
+  ) where
 
 import Control.Monad
 import Control.Monad.State
@@ -6,10 +12,12 @@ import Control.Monad.Trans.Maybe
 import Prelude hiding (log)
 
 type Res = MaybeT (StateT [String] IO)
-data Upgrade = Upgrade
-  { num :: Int
-  , run :: Res () 
-  }
+
+data Upgrade =
+  Upgrade
+    { num :: Int
+    , run :: Res ()
+    }
 
 log :: String -> Res ()
 log s = do
@@ -20,7 +28,7 @@ crash :: Res ()
 crash = mzero
 
 eval :: Res a -> IO (Maybe a, [String])
-eval r = (runStateT $ runMaybeT $ r) []
+eval r = (runStateT . runMaybeT) r []
 
 runOne :: Upgrade -> Res Int
 runOne u = do

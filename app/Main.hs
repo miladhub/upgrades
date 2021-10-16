@@ -1,24 +1,25 @@
 module Main where
 
-import Upgrades
 import Prelude hiding (log)
+import Upgrades
 
 main :: IO ()
 main = do
   r <- upgrade [u1, u2]
-  putStrLn $ show r
+  print r
 
-u1 = Upgrade {
-  num = 1,
-  run = do
-    log "did this"
-    log "did that"
-  }
+u1 =
+  Upgrade
+    { num = 1
+    , run =
+        do log "did this"
+           log "did that"
+    }
 
-u2 = Upgrade {
-  num = 2,
-  run = do
-    log "attempting upgrade"
-    crash
-  }
-
+u2 =
+  Upgrade
+    { num = 2
+    , run =
+        do log "attempting upgrade"
+           crash
+    }
