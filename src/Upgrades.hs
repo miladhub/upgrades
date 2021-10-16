@@ -32,14 +32,3 @@ runAll = traverse runOne
 
 upgrade :: [Upgrade] -> IO (Maybe [Int], [String])
 upgrade = eval . runAll
-
---import Control.Monad.Trans.Except
---type Res = StateT [String] (MaybeT IO)
---type Res = ExceptT [String] (MaybeT IO)
-
-{-
-  IO (State [String] (Maybe Int))
-= StateT [String] IO (Maybe Int)
-= MaybeT (StateT [String] IO) Int
--}
-
