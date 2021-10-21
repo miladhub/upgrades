@@ -4,22 +4,20 @@ import Prelude hiding (log)
 import Upgrades
 
 main :: IO ()
-main = do
-  r <- upgrade [u1, u2]
-  print r
+main = upgrade [u1, u2]
+
+instance Console IO where
+  write = putStrLn
 
 u1 =
   Upgrade
     { num = 1
-    , run =
-        do log "did this"
-           log "did that"
+    , run = return ["foo", "bar"]
     }
 
 u2 =
   Upgrade
     { num = 2
-    , run =
-        do log "attempting upgrade"
-           crash
+    , run = return ["baz"]
     }
+

@@ -1,42 +1,26 @@
-module Upgrades
-  ( Res
-  , Upgrade(..)
-  , log
-  , crash
-  , upgrade
-  ) where
+{-# LANGUAGE GADTs #-}
 
-import Control.Monad
-import Control.Monad.State
-import Control.Monad.Trans.Maybe
-import Prelude hiding (log)
+module Upgrades (Upgrade(..), upgrade, Console(..)) where
 
-type Res = MaybeT (StateT [String] IO)
+import Control.Monad (forM_)
 
-data Upgrade =
-  Upgrade
-    { num :: Int
-    , run :: Res ()
-    }
+class Monad m => Console m where
+  write :: String -> m () 
 
-log :: String -> Res ()
-log s = do
-  logs <- get
-  put (logs ++ [s])
+data Upgrade m where
+  Upgrade ::
+    { num :: Int                           
+    , run :: m [String]
+    } -> Upgrade m
 
-crash :: Res ()
-crash = mzero
+upgrade :: Console m => [Upgrade m] -> m ()
+upgrade us = do 
+  logs <- concat <$> (sequence $ runOne <$> us)
+  writeLogs logs
 
-eval :: Res a -> IO (Maybe a, [String])
-eval r = (runStateT . runMaybeT) r []
+writeLogs :: Console m => [String] -> m ()
+writeLogs xs = forM_ xs write
 
-runOne :: Upgrade -> Res Int
-runOne u = do
-  run u
-  return (num u)
+runOne :: Console m => Upgrade m -> m [String]
+runOne = run
 
-runAll :: [Upgrade] -> Res [Int]
-runAll = traverse runOne
-
-upgrade :: [Upgrade] -> IO (Maybe [Int], [String])
-upgrade = eval . runAll
